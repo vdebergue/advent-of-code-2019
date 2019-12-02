@@ -15,7 +15,7 @@ object Day01 {
     println(s"Adjusted fuel for all modules: $sumExtended")
   }
 
-  def getModuleFuel(module: Int) : Int = (Math.floor(module / 3.0) - 2).toInt
+  def getModuleFuel(module: Int): Int = (Math.floor(module / 3.0) - 2).toInt
 
   def getModuleFuelExtended(module: Int): Int = {
     val fuel = getModuleFuel(module)

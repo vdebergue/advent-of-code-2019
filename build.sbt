@@ -1,5 +1,5 @@
 ThisBuild / scalaVersion := "2.13.1"
-ThisBuild / organization := "com.github.vdeberge"
+ThisBuild / organization := "com.github.vdebergue"
 
 lazy val advent = (project in file("."))
   .settings(
@@ -8,3 +8,5 @@ lazy val advent = (project in file("."))
       "org.scalatest" %% "scalatest" % "3.1.0" % Test
     )
   )
+
+scalafmtOnCompile := true
