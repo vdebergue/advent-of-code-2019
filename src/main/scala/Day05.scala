@@ -3,9 +3,11 @@ object Day05 {
   def main(args: Array[String]): Unit = {
     val file = scala.io.Source.fromURL(getClass.getResource("Day05.txt"))
     val inputStr = file.mkString
-    val program = Day02.parseProgram(inputStr).toSeq
+    val program = Day02.parseProgram(inputStr).toList
 
     runProgram(program, 1)
+
+    runProgram(program, 5)
   }
 
   def runProgram(program: Seq[Int], input: Int): Int = {
@@ -21,11 +23,15 @@ object Day05 {
     while (!s.finished) {
       val instruction = parseInstruction(state.memory(state.pointer))
       val operation = Operation.toOperation(instruction.opCode)
+      val previousPointer = state.pointer
       operation.execute(instruction)
       if (operation == Operation.SetOutput) {
         println(s"ouput == ${state.output}")
       }
-      state.pointer = state.pointer + operation.numParameters + 1
+      if (previousPointer == state.pointer) {
+        // advance pointer
+        state.pointer = state.pointer + operation.numParameters + 1
+      }
     }
     state
   }
@@ -38,10 +44,19 @@ object Day05 {
   def parseInstruction(n: Int): Instruction = {
     val format = new java.text.DecimalFormat("00000")
     val str = format.format(n)
-    Instruction(str.slice(3,5).toInt, Seq(ParameterMode.parse(str(2)), ParameterMode.parse(str(1)), ParameterMode.parse(str(0))))
+    Instruction(
+      str.slice(3, 5).toInt,
+      Seq(ParameterMode.parse(str(2)), ParameterMode.parse(str(1)), ParameterMode.parse(str(0)))
+    )
   }
 
-  case class MemoryState(memory: Array[Int], var pointer: Int, var input: Option[Int] = None, var output: Option[Int] = None, var finished: Boolean = false)
+  case class MemoryState(
+      memory: Array[Int],
+      var pointer: Int,
+      var input: Option[Int] = None,
+      var output: Option[Int] = None,
+      var finished: Boolean = false
+  )
 
   sealed trait ParameterMode
   object ParameterMode {
@@ -63,7 +78,7 @@ object Day05 {
       val mode = instruction.modes(argNumber)
       val argPosition = state.pointer + argNumber + 1
       mode match {
-        case ParameterMode.Position => state.memory(state.memory(argPosition))
+        case ParameterMode.Position  => state.memory(state.memory(argPosition))
         case ParameterMode.Immediate => state.memory(argPosition)
       }
     }
@@ -71,16 +86,20 @@ object Day05 {
 
   object Operation {
     def toOperation(opCode: Int): Operation = opCode match {
-      case 1 => Add
-      case 2 => Mult
-      case 3 => StoreInput
-      case 4 => SetOutput
+      case 1  => Add
+      case 2  => Mult
+      case 3  => StoreInput
+      case 4  => SetOutput
+      case 5  => JumpIfTrue
+      case 6  => JumpIfFalse
+      case 7  => LessThan
+      case 8  => Equals
       case 99 => Stop
     }
 
     case object Add extends Operation {
       val numParameters = 3
-      def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
+      override def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
         val res = getParameter(0, instruction) + getParameter(1, instruction)
         val outPost = state.memory(state.pointer + 3)
         state.memory.update(outPost, res)
@@ -115,6 +134,48 @@ object Day05 {
       def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
         val param = getParameter(0, instruction)
         state.output = Some(param)
+      }
+    }
+
+    case object JumpIfTrue extends Operation {
+      val numParameters = 2
+      def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
+        val pIf = getParameter(0, instruction)
+        if (pIf != 0) {
+          state.pointer = getParameter(1, instruction)
+        }
+      }
+    }
+
+    case object JumpIfFalse extends Operation {
+      val numParameters = 2
+      def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
+        val pIf = getParameter(0, instruction)
+        if (pIf == 0) {
+          state.pointer = getParameter(1, instruction)
+        }
+      }
+    }
+
+    case object LessThan extends Operation {
+      val numParameters = 3
+      def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
+        val p1 = getParameter(0, instruction)
+        val p2 = getParameter(1, instruction)
+        val res = if (p1 < p2) 1 else 0
+        val outPost = state.memory(state.pointer + 3)
+        state.memory.update(outPost, res)
+      }
+    }
+
+    case object Equals extends Operation {
+      val numParameters = 3
+      def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
+        val p1 = getParameter(0, instruction)
+        val p2 = getParameter(1, instruction)
+        val res = if (p1 == p2) 1 else 0
+        val outPost = state.memory(state.pointer + 3)
+        state.memory.update(outPost, res)
       }
     }
   }

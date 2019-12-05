@@ -48,8 +48,8 @@ object Day03 {
     val pointsB = pointsCrossedFromOrigin(cableB)
     val intersections = pointsA.toSet.intersect(pointsB.toSet)
     intersections.map { inter =>
-      val distA = pointsA.indexOf(inter) +1
-      val distB = pointsB.indexOf(inter) +1
+      val distA = pointsA.indexOf(inter) + 1
+      val distB = pointsB.indexOf(inter) + 1
       distA + distB
     }.min
   }
@@ -76,9 +76,10 @@ object Day03 {
   }
 
   def pointsCrossedFromOrigin(movements: Seq[Movement]): Seq[Point] = {
-    val (_, crossedPoints) = movements.foldLeft((CentralPort, Vector.empty[Point])) { case ((point, crossed), mov) =>
-      val newPoints = point.pointsCrossed(mov)
-      (newPoints.last, crossed ++ newPoints)
+    val (_, crossedPoints) = movements.foldLeft((CentralPort, Vector.empty[Point])) {
+      case ((point, crossed), mov) =>
+        val newPoints = point.pointsCrossed(mov)
+        (newPoints.last, crossed ++ newPoints)
     }
     crossedPoints
   }
