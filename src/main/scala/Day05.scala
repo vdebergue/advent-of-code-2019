@@ -13,7 +13,7 @@ object Day05 {
   def runProgram(program: Seq[Int], input: Int): Int = {
     val prog = program.toArray
     // init program
-    val state = MemoryState(prog, pointer = 0, input = Some(input))
+    val state = MemoryState(prog, pointer = 0, input = List(input))
     val finalState = evaluateProgram(state)
     finalState.memory(0)
   }
@@ -53,7 +53,7 @@ object Day05 {
   case class MemoryState(
       memory: Array[Int],
       var pointer: Int,
-      var input: Option[Int] = None,
+      var input: List[Int] = Nil,
       var output: Option[Int] = None,
       var finished: Boolean = false
   )
@@ -125,7 +125,8 @@ object Day05 {
       val numParameters = 1
       def execute(instruction: Instruction)(implicit state: MemoryState): Unit = {
         val outPost = state.memory(state.pointer + 1)
-        state.memory.update(outPost, state.input.get)
+        state.memory.update(outPost, state.input.head)
+        state.input = state.input.tail
       }
     }
 
