@@ -1,4 +1,4 @@
-import Day05.{MemoryState, parseInstruction}
+import Day05.{parseInstruction, MemoryState}
 
 object Day07 {
 
@@ -27,7 +27,7 @@ object Day07 {
   }
 
   def runSettings(settings: Seq[Int], program: Seq[Int]): Int = {
-    val output = settings.foldLeft(0){ case (input, phase) => runAmplifier(phase, input, program)}
+    val output = settings.foldLeft(0) { case (input, phase) => runAmplifier(phase, input, program) }
     println(s"setting $settings -> $output")
     output
   }
@@ -44,12 +44,12 @@ object Day07 {
     var signal = 0
     var amplifierIndex = 0
     var finished = false
-    while(!finished) {
+    while (!finished) {
       val amplifier = states(amplifierIndex)
       amplifier.input = amplifier.input :+ signal
       var amplifierFinished = false
 
-      while(!amplifierFinished) {
+      while (!amplifierFinished) {
         val instruction = Day05.parseInstruction(amplifier.memory(amplifier.pointer))
         val operation = Day05.Operation.toOperation(instruction.opCode)
         val previousPointer = amplifier.pointer

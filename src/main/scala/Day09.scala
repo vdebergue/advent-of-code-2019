@@ -15,7 +15,7 @@ object Day09 {
   def runProgram(program: Seq[Long], inputs: Seq[Long] = Seq.empty): Seq[Long] = {
     // grow memory to handle programs
     val memory = program.toArray.padTo(math.max(2 * program.size, 1000), 0L)
-    val state = MemoryState(memory, input =  inputs.toList)
+    val state = MemoryState(memory, input = inputs.toList)
     evaluateProgram(state)
     state.output
   }
@@ -53,13 +53,13 @@ object Day09 {
   }
 
   case class MemoryState(
-                          memory: Array[Long],
-                          var pointer: Int = 0,
-                          var input: List[Long] = Nil,
-                          var output: Vector[Long] = Vector.empty,
-                          var finished: Boolean = false,
-                          var relativeBase: Int = 0
-                        )
+      memory: Array[Long],
+      var pointer: Int = 0,
+      var input: List[Long] = Nil,
+      var output: Vector[Long] = Vector.empty,
+      var finished: Boolean = false,
+      var relativeBase: Int = 0
+  )
 
   sealed trait ParameterMode
   object ParameterMode {
@@ -83,7 +83,7 @@ object Day09 {
       val mode = instruction.modes(argNumber)
       mode match {
         case ParameterMode.Immediate => state.memory(state.pointer + argNumber + 1)
-        case _  => state.memory(getAddress(argNumber, instruction))
+        case _                       => state.memory(getAddress(argNumber, instruction))
       }
     }
 
@@ -91,9 +91,9 @@ object Day09 {
       val mode = instruction.modes(argNumber)
       val argPosition = state.pointer + argNumber + 1
       mode match {
-        case ParameterMode.Position => state.memory(argPosition).toInt
+        case ParameterMode.Position  => state.memory(argPosition).toInt
         case ParameterMode.Immediate => sys.error("Illegal")
-        case ParameterMode.Relative => (state.relativeBase + state.memory(argPosition)).toInt
+        case ParameterMode.Relative  => (state.relativeBase + state.memory(argPosition)).toInt
       }
     }
   }
@@ -108,7 +108,7 @@ object Day09 {
       case 6  => JumpIfFalse
       case 7  => LessThan
       case 8  => Equals
-      case 9 => AdjustRelativeBase
+      case 9  => AdjustRelativeBase
       case 99 => Stop
     }
 
